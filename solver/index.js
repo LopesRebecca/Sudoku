@@ -1,11 +1,10 @@
 const sudokuController = (function () { 
     
+    const wrapper = document.getElementsByClassName("sudoku")[0];
     const sudokuArrayInput = [];
     const boxPattern =     [[0, 0], [0, 1], [0, 2],
                             [1, 0], [1, 1], [1, 2],
-                            [2, 0], [2, 1], [2, 2]]
-    const wrapper = document.getElementsByClassName("sudoku")[0];
-    
+                            [2, 0], [2, 1], [2, 2]]   
     var answerArray = [];
 
     for(let i = 0; i < 81; i++){
@@ -19,21 +18,16 @@ const sudokuController = (function () {
     }
         
     solve = function(){
-        debugger;
-        let sudoku = splitSudoko(sudokuArrayInput);
-        answerArray = solving(sudoku);
+        answerArray = solving(splitSudoko(sudokuArrayInput));
         changeBoard(answerArray);
     }
     
     solving = function(sudoko){
-
         if(finishedSolution(sudoko)){
             return sudoko;
         }else{
-            let cleanSolutions = removeSolutions(validSolution(sudoko));
-            return correctResult(cleanSolutions);
+            return correctResult(removeSolutions(validSolution(sudoko)));
         }
-        
     }
     
     correctResult = function(sudokus){
@@ -145,12 +139,12 @@ const sudokuController = (function () {
 
         if (coordinates != null) {
             for (let index = 1; index < 10; index++){
-                let newBoard = [...solutions] //spread
-                let row = [...newBoard[coordinates[0]]]//spread
+                let validSulution = [...solutions] //spread
+                let row = [...validSulution[coordinates[0]]]//spread
 
                 row[coordinates[1]] = index;
-                newBoard[coordinates[0]] = row
-                resolutions.push(newBoard)
+                validSulution[coordinates[0]] = row
+                resolutions.push(validSulution)
             }
         }
         return resolutions;
@@ -178,7 +172,7 @@ const sudokuController = (function () {
     }   
 
     changeBoard = function (sudokoAnswer) {
-        debugger;
+        
         let outputSudoko = sudokoAnswer.join();
         let answer = outputSudoko.split(',');
         for (let i = 0; i < 81; i++) {
@@ -186,6 +180,11 @@ const sudokuController = (function () {
         }
     }
 
+    cleaning = function(){
+        for (let cell = 0; cell < 81; cell++) {
+            sudokuArrayInput[cell].value = "";
+        }
+    }
 
 })();
 
