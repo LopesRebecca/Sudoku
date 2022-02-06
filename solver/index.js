@@ -1,14 +1,12 @@
 const sudokuController = (function () { 
-
+    
     const sudokuArrayInput = [];
-    const answerArray = [];
     const boxPattern =     [[0, 0], [0, 1], [0, 2],
                             [1, 0], [1, 1], [1, 2],
                             [2, 0], [2, 1], [2, 2]]
     const wrapper = document.getElementsByClassName("sudoku")[0];
-
-    var sudoku = [];                                            //cria o array
-
+    
+    var answerArray = [];
 
     for(let i = 0; i < 81; i++){
         const numberInput = document.createElement("input");    //cria o input
@@ -19,30 +17,38 @@ const sudokuController = (function () {
         sudokuArrayInput[i] = numberInput;
         wrapper.appendChild(numberInput);
     }
-    
-    
+        
     solve = function(){
         debugger;
-        finished = false;
-
-        sudoku = splitSudoko(sudokuArrayInput);
+        let sudoku = splitSudoko(sudokuArrayInput);
         answerArray = solving(sudoku);
-        changeBoard(answerArray,sudoku);
+        changeBoard(answerArray);
     }
     
     solving = function(sudoko){
 
-        if(finished(sudoku)){
+        if(finishedSolution(sudoko)){
             return sudoko;
         }else{
             let cleanSolutions = removeSolutions(validSolution(sudoko));
-
+            return correctResult(cleanSolutions);
         }
         
     }
     
-    changeBoard = function(solved,unsolved){
-        
+    correctResult = function(sudokus){
+        if(sudokus.length < 1){
+            return false;
+        }else{
+            var backtracking = solving(sudokus.shift());
+
+            if(backtracking != false){
+                return backtracking;
+            }else{
+                return correctResult(sudokus);
+            }
+
+        }
     }
     
     isValid = function(sudoko){
@@ -58,7 +64,7 @@ const sudokuController = (function () {
                 if (temp.includes(sudoko[i][j])){
                     return false
                 }
-                else if (sudoko[i][j] != null){
+                else if (sudoko[i][j] != 0){
                     temp.push(sudoko[i][j])
                 }
             }
@@ -71,26 +77,26 @@ const sudokuController = (function () {
                 if (temp.includes(sudoko[j][i])){
                     return false
                 }
-                else if (sudoko[j][i] != null){
+                else if (sudoko[j][i] != 0){
                     temp.push(sudoko[j][i])
                 }
             }
         }
 
-        for (var i = 0; i < 9; i += 3){
-            for (var j = 0; j < 9; j += 3){
+        for (let i = 0; i < 9; i += 3){
+            for (let j = 0; j < 9; j += 3){
                 let temp = []
                 
-                for (var i = 0; i < 9; i++){
-                    let coordinates = [...boxPattern[i]]
+                for (let k = 0; k < 9; k++){
+                    let coordinates = [...boxPattern[k]]
 
                     coordinates[0] += i
                     coordinates[1] += j
-                    if (cur.includes(board[coordinates[0]][coordinates[1]])){
+                    if (temp.includes(sudoko[coordinates[0]][coordinates[1]])){
                         return false
                     }
-                    else if (board[coordinates[0]][coordinates[1]] != null){
-                        cur.push(board[coordinates[0]][coordinates[1]])
+                    else if (sudoko[coordinates[0]][coordinates[1]] != 0){
+                        temp.push(sudoko[coordinates[0]][coordinates[1]])
                     }
                 }
             }
@@ -99,25 +105,29 @@ const sudokuController = (function () {
         return true;
     }
 
-    finished = function(sudoku){
+    finishedSolution = function(sudoku){
         let regex = new RegExp("[1-9]");
-        
-        for (let cell = 0; cell < 81; cell++) {
-            if(!regex.test(sudoku[cell])){
-                return false
+
+        for (let row = 0; row < 9; row++) {
+            for (let column = 0;column < 9; column++) {
+                if(!regex.test(sudoku[row][column])){
+                    return false
+                }
             }
-            return true
         }
+
+        return true
     } 
 
-    splitSudoko = function (splitSudoko) {
+    splitSudoko = function (splitSudokoArray) {
         let chunk = 9;
+        let splitSudokoTemp = [];
 
         for (let cell = 0; cell < 81; cell++) {
-            splitSudoko[cell] = parseInt(splitSudoko[cell].value || 0);
+            splitSudokoTemp[cell] = parseInt(splitSudokoArray[cell].value || 0);
         }
     
-        return splitSudoko.reduce((resultArray, item, index) => { 
+        return splitSudokoTemp.reduce((resultArray, item, index) => { 
             const chunkIndex = Math.floor(index/chunk)
 
             if(!resultArray[chunkIndex]) {
@@ -135,10 +145,10 @@ const sudokuController = (function () {
 
         if (coordinates != null) {
             for (let index = 1; index < 10; index++){
-                let newBoard = [...board] //spread
+                let newBoard = [...solutions] //spread
                 let row = [...newBoard[coordinates[0]]]//spread
 
-                row[coordinates[1]] = i
+                row[coordinates[1]] = index;
                 newBoard[coordinates[0]] = row
                 resolutions.push(newBoard)
             }
@@ -164,7 +174,18 @@ const sudokuController = (function () {
                 cleanSolutions.push(sudoku[index]);
             }
         }
+        return cleanSolutions;
     }   
+
+    changeBoard = function (sudokoAnswer) {
+        debugger;
+        let outputSudoko = sudokoAnswer.join();
+        let answer = outputSudoko.split(',');
+        for (let i = 0; i < 81; i++) {
+            sudokuArrayInput[i].value = answer[i];
+        }
+    }
+
 
 })();
 
