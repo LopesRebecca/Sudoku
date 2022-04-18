@@ -1,2 +1,2 @@
 # Sudoku
-algoritmo de solução do problema mateamtico Sudoku
+algoritmo de solução do problema matematico Sudoku
